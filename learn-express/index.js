@@ -1,4 +1,5 @@
 const app = require('./app')
+
 const {mongoConnect} = require('./src/services/mongo')
 
 const startServer = async() => {
