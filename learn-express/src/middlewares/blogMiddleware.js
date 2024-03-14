@@ -15,4 +15,4 @@ const isValid = (req, res, next) => {
     }
 };
 
-module.exports = isValid;
+module.export = isValid;
