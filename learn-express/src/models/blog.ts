@@ -5,7 +5,7 @@ export interface IBlog extends Document {
     author: string;
     content: string;
     blogComments: string[];
-    blogLikes: Array<mongoose.Schema.Types.ObjectId>;
+    blogLikes: Array<mongoose.Types.ObjectId>;
 }
 
 // const schema = mongoose.Schemas
@@ -24,7 +24,7 @@ const BlogSchema: Schema = new Schema(
       required: true
     },
     blogComments: [{type:String}],
-    blogLikes: [{type: mongoose.Schema.Types.ObjectId, ref: "Like"}]
+    blogLikes: [{type: mongoose.Types.ObjectId, ref: "Like"}]
   },
   { timestamps: true}
 );
