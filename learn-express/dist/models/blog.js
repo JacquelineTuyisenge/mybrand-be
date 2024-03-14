@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-// const schema = mongoose.Schema
+// const schema = mongoose.Schemas
 const BlogSchema = new mongoose_1.Schema({
     title: {
         type: String,
@@ -38,5 +38,7 @@ const BlogSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
+    blogComments: [{ type: String }],
+    blogLikes: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "Like" }]
 }, { timestamps: true });
 exports.default = mongoose_1.default.model("Blog", BlogSchema);

@@ -1,6 +1,5 @@
-import app from './app';
-
 import {mongoConnect} from './services/mongo';
+import app from './app';
 
 const startServer = async(): Promise<void> => {
 

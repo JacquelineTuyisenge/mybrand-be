@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
 const mongo_1 = require("./services/mongo");
+const app_1 = __importDefault(require("./app"));
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, mongo_1.mongoConnect)();
     const port = 5000;

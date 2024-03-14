@@ -4,9 +4,11 @@ export interface IBlog extends Document {
     title: string;
     author: string;
     content: string;
+    blogComments: string[];
+    blogLikes: Array<mongoose.Schema.Types.ObjectId>;
 }
 
-// const schema = mongoose.Schema
+// const schema = mongoose.Schemas
 const BlogSchema: Schema = new Schema(
   {
     title: {
@@ -21,6 +23,8 @@ const BlogSchema: Schema = new Schema(
       type: String,
       required: true
     },
+    blogComments: [{type:String}],
+    blogLikes: [{type: mongoose.Schema.Types.ObjectId, ref: "Like"}]
   },
   { timestamps: true}
 );
