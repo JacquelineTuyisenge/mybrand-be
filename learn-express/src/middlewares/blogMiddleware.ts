@@ -10,7 +10,7 @@ const isValid = (req: Request, res: Response, next: Function) => {
          return res.status(400).json({message: error.details[0].message});
     }
     
-    // if no error, middle ware continues
+    // if no error, middleware gives permission to go to next, 
     try{
         next()
     } catch(error){
