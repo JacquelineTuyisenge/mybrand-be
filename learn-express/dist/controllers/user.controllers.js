@@ -17,6 +17,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const accessToken_1 = require("../security/accessToken");
 // create user/sign up
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const { fullName, email, password, confirmPassword, role } = req.body;
     // check if user is already logged in
     const user = yield user_1.default.findOne({ email: req.body.email });
     if (user) {
@@ -26,9 +27,12 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     try {
+        // When a new user signs up, their password is hashed using bcrypt for security
         const salt = yield bcryptjs_1.default.genSalt();
         const hashedPassword = yield bcryptjs_1.default.hash(req.body.password, salt);
         const hashedConfirmPassword = yield bcryptjs_1.default.hash(req.body.confirmPassword, salt);
+        // const user = await user.create({})
+        // hashed password is stored along with other user details in the database
         const newUser = new user_1.default({
             fullName: req.body.fullName,
             email: req.body.email,
@@ -50,9 +54,16 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const logIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const { email, password } = req.body;
     //if user is there
     const user = yield user_1.default.findOne({ email: req.body.email });
-    // if user exist or password matches
+    if (!user) {
+        return res.status(409).json({
+            status: "Fail",
+            message: "Invalid user or password. Please try again!",
+        });
+    }
+    //  compare the provided password with the hashed password stored in the database.
     const isPasswordTrue = user ? yield bcryptjs_1.default.compare(req.body.password, user.password) : false;
     if (!isPasswordTrue) {
         // If user is not found or password doesn't match
@@ -62,7 +73,7 @@ const logIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     try {
-        const token = (0, accessToken_1.generateAccessToken)(user);
+        const token = (0, accessToken_1.generateAccessToken)(user._id);
         res.status(200).json({
             status: "Success",
             message: "user loggin is successful!",
@@ -78,12 +89,17 @@ const logIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const loggedInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { user } = req;
-    if (user) {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if (userId) {
         return res.status(200).json({
             status: "Success",
-            message: "user fetching is successful!",
-            user: user
+            message: "LoggedIn user fetched successfully!",
+            user: {
+                fullName: user === null || user === void 0 ? void 0 : user.fullName,
+                email: user === null || user === void 0 ? void 0 : user.email,
+                role: user === null || user === void 0 ? void 0 : user.role,
+            },
         });
     }
     else {
@@ -94,6 +110,14 @@ const loggedInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
     try {
         const users = yield user_1.default.find({});
         res.status(200).json({
@@ -111,6 +135,14 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
     try {
         const id = req.params.id;
         const user = yield user_1.default.findById(id);
@@ -135,6 +167,14 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
     try {
         const salt = yield bcryptjs_1.default.genSalt();
         const hashedPassword = yield bcryptjs_1.default.hash(req.body.password, salt);
@@ -166,6 +206,14 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
     try {
         const id = req.params.id;
         const user = yield user_1.default.findByIdAndDelete(id);

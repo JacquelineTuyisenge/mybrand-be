@@ -9,4 +9,5 @@ const commentMiddleware_1 = __importDefault(require("../middlewares/commentMiddl
 const commentRouter = express_1.default.Router();
 commentRouter.post("/:id/comments", commentMiddleware_1.default, comments_controllers_1.default.httpAddComment);
 commentRouter.get("/:id/comments", comments_controllers_1.default.httpGetComments);
+// commentRouter.delete("/:id/comments", httpComment.httpDeleteCommentsForBlog)
 exports.default = commentRouter;

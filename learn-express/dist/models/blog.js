@@ -38,7 +38,10 @@ const BlogSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    blogComments: [{ type: String }],
+    blogComments: [{
+            author: { type: String },
+            comment: { type: String }
+        }],
     blogLikes: [{ type: mongoose_1.default.Types.ObjectId, ref: "Like" }]
 }, { timestamps: true });
 exports.default = mongoose_1.default.model("Blog", BlogSchema);

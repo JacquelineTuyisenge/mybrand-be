@@ -4,6 +4,8 @@ import httpBlog from '../controllers/blog.controllers';
 
 import isValid from '../middlewares/blogMiddleware';
 
+import authenticateLogin from "../middlewares/authentication";
+
 const blogRouter = express.Router(); // specific router for blog
 
 // get all blogs
@@ -16,9 +18,9 @@ blogRouter.post("/", isValid, httpBlog.httpCreateBlog);
 blogRouter.get("/:id", httpBlog.httpGetSingleBlog);
 
 // Update the blog , single blog
-blogRouter.patch("/:id", httpBlog.httpUpdateSingleBlog);
+blogRouter.patch("/:id",authenticateLogin ,  httpBlog.httpUpdateSingleBlog);
 
 // delete blog post
-blogRouter.delete("/:id", httpBlog.httpDeleteSingleBlog);
+blogRouter.delete("/:id",authenticateLogin ,httpBlog.httpDeleteSingleBlog);
 
 export default blogRouter; // export the blogrouter

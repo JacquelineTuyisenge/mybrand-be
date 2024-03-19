@@ -1,5 +1,10 @@
 import { Request, Response } from "express";
 import Querry from "../models/querries";
+import User from "../models/user";
+
+interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
+    user?: any;
+  }
 
 // post querries
 const httpAddQuerries = async (req: Request, res: Response): Promise<void> => {
@@ -28,7 +33,16 @@ const httpAddQuerries = async (req: Request, res: Response): Promise<void> => {
 
 //get all querries
 
-const httpGetAllQuerries = async (req: Request, res: Response): Promise<void> => {
+const httpGetAllQuerries = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if (user?.role !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
+
     try {
         const querries = await Querry.find({});
 
@@ -47,7 +61,15 @@ const httpGetAllQuerries = async (req: Request, res: Response): Promise<void> =>
 };
 
 //get single querry
-const httpGetQuerry = async (req: Request, res: Response): Promise<void> => {
+const httpGetQuerry = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if (user?.role !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
 
     try {
         const id = req.params.id;
@@ -78,7 +100,16 @@ const httpGetQuerry = async (req: Request, res: Response): Promise<void> => {
 
 // update querry
 
-const httpUpdateQuerry = async (req: Request, res: Response): Promise<void> => {
+const httpUpdateQuerry = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if (user?.role !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
+
     try {
 
         const id = req.params.id;
@@ -116,7 +147,15 @@ const httpUpdateQuerry = async (req: Request, res: Response): Promise<void> => {
 
 //delete querry
 
-const httpDeleteQuerry = async (req: Request, res: Response): Promise<void> => {
+const httpDeleteQuerry = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if (user?.role !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
 
     try {
         const id = req.params.id;

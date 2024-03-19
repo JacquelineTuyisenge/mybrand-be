@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import User from "../models/user";
 import { validateAccessToken } from "../security/accessToken";
 import { JwtPayload } from "jsonwebtoken";
 
@@ -10,7 +11,7 @@ const authenticateLogin = async (req: AuthenticatedRequest, res: Response, next:
     const token = req.headers["authorization"];
 
     if (!token || typeof token !== "string") {
-        return res.status(400).json({
+        return res.status(401).json({
           status: "Fail",
           message: "Please logIn to continue!",
         });
@@ -18,23 +19,24 @@ const authenticateLogin = async (req: AuthenticatedRequest, res: Response, next:
 
     try {
         const decoded = validateAccessToken(token) as JwtPayload;
-
-        if (decoded){
-            req.user = decoded.data;
-        } else {
-            return res.status(400).json({
+        
+            if (decoded) {
+              req.user = decoded.userId;
+            } else {
+              return res.status(401).json({
                 status: "Fail",
-                message: "Can not Access User!",
+                message: "Unauthorized, Please logIn to continue!",
+              });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(409).json({
+              status: "Fail",
+              message: "Please logIn to continue!",
             });
         }
-    } catch (error){
-        console.log(error);
-        res.status(400).json({
-            status: "Fail",
-            message: "Please logIn to continue!",
-        });
-    }
-    next();
+        next();
+    
 };
 
 export default authenticateLogin;

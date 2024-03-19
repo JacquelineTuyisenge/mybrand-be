@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const querries_1 = __importDefault(require("../models/querries"));
+const user_1 = __importDefault(require("../models/user"));
 // post querries
 const httpAddQuerries = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -38,6 +39,12 @@ const httpAddQuerries = (req, res) => __awaiter(void 0, void 0, void 0, function
 });
 //get all querries
 const httpGetAllQuerries = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
     try {
         const querries = yield querries_1.default.find({});
         res.status(200).json({
@@ -56,6 +63,12 @@ const httpGetAllQuerries = (req, res) => __awaiter(void 0, void 0, void 0, funct
 });
 //get single querry
 const httpGetQuerry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
     try {
         const id = req.params.id;
         const singleQuerry = yield querries_1.default.findById(id);
@@ -82,6 +95,12 @@ const httpGetQuerry = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 // update querry
 const httpUpdateQuerry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
     try {
         const id = req.params.id;
         const updatedQuerry = yield querries_1.default.findByIdAndUpdate(id, {
@@ -113,6 +132,12 @@ const httpUpdateQuerry = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 //delete querry
 const httpDeleteQuerry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can do this" });
+        return;
+    }
     try {
         const id = req.params.id;
         if (!id) {

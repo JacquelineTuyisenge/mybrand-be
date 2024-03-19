@@ -13,7 +13,7 @@ const accessToken_1 = require("../security/accessToken");
 const authenticateLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.headers["authorization"];
     if (!token || typeof token !== "string") {
-        return res.status(400).json({
+        return res.status(401).json({
             status: "Fail",
             message: "Please logIn to continue!",
         });
@@ -21,18 +21,18 @@ const authenticateLogin = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     try {
         const decoded = (0, accessToken_1.validateAccessToken)(token);
         if (decoded) {
-            req.user = decoded.data;
+            req.user = decoded.userId;
         }
         else {
-            return res.status(400).json({
+            return res.status(401).json({
                 status: "Fail",
-                message: "Can not Access User!",
+                message: "Unauthorized, Please logIn to continue!",
             });
         }
     }
     catch (error) {
         console.log(error);
-        res.status(400).json({
+        res.status(409).json({
             status: "Fail",
             message: "Please logIn to continue!",
         });

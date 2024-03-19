@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import Blog, { IBlog } from "../models/blog";
+import User from "../models/user";
+
+interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
+    user?: any;
+  }
+
 
 // create blog
 const httpCreateBlog = async (req: Request, res: Response): Promise<void> => {
@@ -49,7 +55,16 @@ const httpGetSingleBlog = async (req: Request, res: Response): Promise<void> => 
 };
 
 //update single blog
-const httpUpdateSingleBlog = async (req: Request, res: Response): Promise<void> => {
+const httpUpdateSingleBlog = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+
+    const userId = req.user;
+    const user = await User.findOne({ _id: userId});
+
+    if (user?.role == "User") {
+        res.status(401).json({ error: "Unauthorized, only Admins can update" });
+        return;
+    }
+
     try {
         const blogId = req.params.id;
         const update: Partial<IBlog> = {}; // Partial<IBlog> allows us to construct an object with possibly incomplete IBlog properties
@@ -71,7 +86,16 @@ const httpUpdateSingleBlog = async (req: Request, res: Response): Promise<void> 
 };
 
 //delete single blog
-const httpDeleteSingleBlog = async (req: Request, res: Response): Promise<void> => {
+const httpDeleteSingleBlog = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+
+    const userId = req.user;
+    const user = await User.findOne({ _id: userId});
+
+    if (user?.role !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can delete" });
+        return;
+    }
+
     try {
         const blogId = req.params.id;
         const deletedBlog = await Blog.findByIdAndDelete(blogId);

@@ -1,10 +1,11 @@
 import mongoose, {Schema, Document } from "mongoose";
+import { CommentObject } from "../controllers/comments.controllers";
 
 export interface IBlog extends Document {
     title: string;
     author: string;
     content: string;
-    blogComments: string[];
+    blogComments: CommentObject[];
     blogLikes: Array<mongoose.Types.ObjectId>;
 }
 
@@ -23,7 +24,10 @@ const BlogSchema: Schema = new Schema(
       type: String,
       required: true
     },
-    blogComments: [{type:String}],
+    blogComments: [{ // Define blogComments as an array of objects containing author and comment properties
+      author: { type: String },
+      comment: { type: String }
+  }],
     blogLikes: [{type: mongoose.Types.ObjectId, ref: "Like"}]
   },
   { timestamps: true}

@@ -7,10 +7,10 @@ exports.validateAccessToken = exports.generateAccessToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const generateAccessToken = (user) => {
+const generateAccessToken = (userId) => {
     const tokenKey = process.env.ACCESS_TOKEN_KEY;
-    const token = jsonwebtoken_1.default.sign({ data: user }, tokenKey, {
-        expiresIn: "30 min"
+    const token = jsonwebtoken_1.default.sign({ userId }, tokenKey, {
+        expiresIn: "10 min"
     });
     return token;
 };

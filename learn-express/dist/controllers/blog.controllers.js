@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const blog_1 = __importDefault(require("../models/blog"));
+const user_1 = __importDefault(require("../models/user"));
 // create blog
 const httpCreateBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { title, author, content } = req.body;
@@ -60,6 +61,12 @@ const httpGetSingleBlog = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 //update single blog
 const httpUpdateSingleBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) == "User") {
+        res.status(401).json({ error: "Unauthorized, only Admins can update" });
+        return;
+    }
     try {
         const blogId = req.params.id;
         const update = {}; // Partial<IBlog> allows us to construct an object with possibly incomplete IBlog properties
@@ -82,6 +89,12 @@ const httpUpdateSingleBlog = (req, res) => __awaiter(void 0, void 0, void 0, fun
 });
 //delete single blog
 const httpDeleteSingleBlog = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const user = yield user_1.default.findOne({ _id: userId });
+    if ((user === null || user === void 0 ? void 0 : user.role) !== "Admin") {
+        res.status(401).json({ error: "Unauthorized, only Admins can delete" });
+        return;
+    }
     try {
         const blogId = req.params.id;
         const deletedBlog = yield blog_1.default.findByIdAndDelete(blogId);

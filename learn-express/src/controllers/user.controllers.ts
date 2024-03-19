@@ -3,8 +3,13 @@ import User from '../models/user';
 import bcrypt from 'bcryptjs';
 import { generateAccessToken } from '../security/accessToken';
 
+interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
+    user?: any;
+  }
+
 // create user/sign up
 const createUser = async (req: Request, res: Response): Promise<void> => {
+    // const { fullName, email, password, confirmPassword, role } = req.body;
     // check if user is already logged in
     const user = await User.findOne({ email: req.body.email });
 
@@ -16,16 +21,20 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     try {
+        // When a new user signs up, their password is hashed using bcrypt for security
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         const hashedConfirmPassword = await bcrypt.hash(req.body.confirmPassword, salt);
+        // const user = await user.create({})
 
+        // hashed password is stored along with other user details in the database
         const newUser = new User({
             fullName: req.body.fullName,
             email: req.body.email,
             password: hashedPassword,
             confirmPassword: hashedConfirmPassword
         });
+
         await newUser.save();
 
         res.status(201).json({
@@ -42,10 +51,17 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 const logIn = async (req: Request, res: Response) => {
+    // const { email, password } = req.body;
     //if user is there
     const user = await User.findOne({ email: req.body.email });
 
-    // if user exist or password matches
+    if (!user) {
+        return res.status(409).json({
+          status: "Fail",
+          message: "Invalid user or password. Please try again!",
+        });
+      }
+    //  compare the provided password with the hashed password stored in the database.
     const isPasswordTrue = user ? await bcrypt.compare(req.body.password, user.password) : false;
 
     if (!isPasswordTrue) {
@@ -57,7 +73,8 @@ const logIn = async (req: Request, res: Response) => {
     }
 
     try {
-        const token = generateAccessToken(user);
+        const token = generateAccessToken(user._id);
+
 
         res.status(200).json({
             status: "Success",
@@ -73,28 +90,42 @@ const logIn = async (req: Request, res: Response) => {
     }
 };
 
-interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
-    user?: any;
-}
+
 
 const loggedInUser = async (req: AuthenticatedRequest, res: Response) => {
-    const { user } = req;
-
-    if (user) {
-        return res.status(200).json({
-            status: "Success",
-            message: "user fetching is successful!",
-            user: user
-        })
+    const userId = req.user;
+  
+    const user = await User.findOne({ _id: userId });
+    if (userId) {
+      return res.status(200).json({
+        status: "Success",
+        message: "LoggedIn user fetched successfully!",
+        user: {
+          fullName: user?.fullName,
+          email: user?.email,
+          role: user?.role,
+        },
+      });
     } else {
-        return res.status(400).json({
+      return res.status(400).json({
+        status: "Fail",
+        message: "User not found!",
+      });
+    }
+  };
+
+const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if(user?.role !== "Admin") {
+        return res.status(401).json({
             status: "Fail",
-            message: "User not found!",
+            message: "Unauthorized, only Admins can do this!"
         });
     }
-};
 
-const getAllUsers = async (req: Request, res: Response) => {
     try {
         const users = await User.find({});
 
@@ -112,7 +143,18 @@ const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
-const getSingleUser = async (req:Request, res: Response) => {
+const getSingleUser = async (req: AuthenticatedRequest, res: Response) => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if(user?.role !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
+
     try {
         const id = req.params.id;
         const user = await User.findById(id);
@@ -138,7 +180,18 @@ const getSingleUser = async (req:Request, res: Response) => {
     }
 };
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: AuthenticatedRequest, res: Response) => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if(user?.role !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
+
     try {
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -174,7 +227,18 @@ const updateUser = async (req: Request, res: Response) => {
     }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
+
+    const userId = req.user;
+
+    const user = await User.findOne({ _id: userId });
+    if(user?.role !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
+    }
+
     try {
         const id = req.params.id;
         const user = await User.findByIdAndDelete(id);
