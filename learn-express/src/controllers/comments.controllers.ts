@@ -129,4 +129,4 @@ const httpGetComments = async (req: Request, res: Response): Promise<void> => {
 // };
 
 
-export default { httpGetComments, httpAddComment }; // httpDeleteCommentsForBlog
+export default { httpGetComments, httpAddComment, }; // httpDeleteCommentsForBlog

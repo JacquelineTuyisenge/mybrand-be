@@ -11,16 +11,25 @@ interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
 const createUser = async (req: Request, res: Response): Promise<void> => {
     // const { fullName, email, password, confirmPassword, role } = req.body;
     // check if user is already logged in
-    const user = await User.findOne({ email: req.body.email });
+    // const user = await User.findOne({ email: req.body.email });
 
-    if (user) {
-        res.status(400).json({
-            status: 'error',
-            message: `email ${req.body.email} already exist!`
-        });
-    }
+    // if (user) {
+    //     res.status(400).json({
+    //         status: 'error',
+    //         message: `email ${req.body.email} already exist!`
+    //     });
+    // }
 
     try {
+        const userExists = await User.findOne({ email: req.body.email });
+
+        if (userExists) {
+            res.status(400).json({
+                status: 'error',
+                message: `Email ${req.body.email} already exists!`
+            });
+            return;
+        }
         // When a new user signs up, their password is hashed using bcrypt for security
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -32,17 +41,19 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
             fullName: req.body.fullName,
             email: req.body.email,
             password: hashedPassword,
-            confirmPassword: hashedConfirmPassword
+            confirmPassword: hashedConfirmPassword,
+            role: req.body.role
         });
 
         await newUser.save();
+
 
         res.status(201).json({
             status: "Success",
             message: "User creation is successful!"
         });
     } catch(error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({
             status: 'Fail',
             message: 'Something went wrong!'
@@ -56,9 +67,9 @@ const logIn = async (req: Request, res: Response) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-        return res.status(409).json({
+        return res.status(400).json({
           status: "Fail",
-          message: "Invalid user or password. Please try again!",
+          message: "Wrong credentials. Please try again!",
         });
       }
     //  compare the provided password with the hashed password stored in the database.
@@ -66,14 +77,14 @@ const logIn = async (req: Request, res: Response) => {
 
     if (!isPasswordTrue) {
     // If user is not found or password doesn't match
-        res.status(400).json({
+        res.status(404).json({
             status: 'error',
-            message: 'Invalid credentials, try again!'
+            message: 'Wrong credentials, try again!'
         });
     }
 
     try {
-        const token = generateAccessToken(user._id);
+        const token = generateAccessToken(user._id, user.role);
 
 
         res.status(200).json({
@@ -94,72 +105,81 @@ const logIn = async (req: Request, res: Response) => {
 
 const loggedInUser = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user;
-  
-    const user = await User.findOne({ _id: userId });
-    if (userId) {
-      return res.status(200).json({
-        status: "Success",
-        message: "LoggedIn user fetched successfully!",
-        user: {
-          fullName: user?.fullName,
-          email: user?.email,
-          role: user?.role,
-        },
-      });
-    } else {
-      return res.status(400).json({
-        status: "Fail",
-        message: "User not found!",
-      });
+
+    try {
+        const user = await User.findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).json({
+                status: "Fail",
+                message: "User not found!",
+            });
+        }
+
+        return res.status(200).json({
+            status: "Success",
+            message: "LoggedIn user fetched successfully!",
+            user: {
+                fullName: user?.fullName,
+                email: user?.email,
+                role: user?.role,
+            },
+        });
+
+    } catch(error) {
+        console.error(error);
+        return res.status(500).json({
+            status: "Error",
+            message: "Something went wrong!",
+        });
     }
-  };
+};
 
 const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
 
-    const userId = req.user;
-
-    const user = await User.findOne({ _id: userId });
-    if(user?.role !== "Admin") {
-        return res.status(401).json({
-            status: "Fail",
-            message: "Unauthorized, only Admins can do this!"
-        });
-    }
-
     try {
+
+        console.log("Decoded user role:", req.user?.role);
+        
+        const user = await User.findOne({ _id: req.user});
+        if (user?.role !== "Admin") {
+            return res.status(401).json({
+                status: "Fail",
+                message: "Unauthorized, only Admins can do this!"
+            });
+        }
+
         const users = await User.find({});
 
         res.status(200).json({
             status: "Success",
             message: "Get all users is successful!",
-            users: users
+            users: users,
         });
-    } catch(error){
-        console.error(error)
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
-            status: 'Fail',
-            message: 'Something went wrong'
+            status: "Error",
+            message: "Something went wrong!",
         });
     }
 };
 
 const getSingleUser = async (req: AuthenticatedRequest, res: Response) => {
 
-    const userId = req.user;
-
-    const user = await User.findOne({ _id: userId });
-    if(user?.role !== "Admin") {
-        return res.status(401).json({
-            status: "Fail",
-            message: "Unauthorized, only Admins can do this!"
-        });
-    }
-
     try {
-        const id = req.params.id;
-        const user = await User.findById(id);
+        const user = await User.findOne({ _id: req.user});
+        if (user?.role !== "Admin") {
+            return res.status(401).json({
+                status: "Fail",
+                message: "Unauthorized, only Admins can do this!"
+            });
+        }
 
-        if (!user) {
+        const id = req.params.id;
+        const userRecord = await User.findById(id);
+
+        if (!userRecord) {
             return res.status(404).json({
                 status: "Fail",
                 message: "User not found!",
@@ -169,14 +189,14 @@ const getSingleUser = async (req: AuthenticatedRequest, res: Response) => {
         res.status(200).json({
             status: "Success",
             message: "fetching User is successful!",
-            users: user,
+            users: userRecord,
         });
-    } catch(error){
-        console.error(error)
+    } catch (error) {
+        console.error(error);
         res.status(500).json({
-            status: "Fail",
-            message: "Something Went Wrong!"
-        });
+            status: "Error",
+            message: "Something went wrong!",
+        });   
     }
 };
 
@@ -185,7 +205,7 @@ const updateUser = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if(user?.role !== "Admin") {
+    if(user?.role === "User") {
         return res.status(401).json({
             status: "Fail",
             message: "Unauthorized, only Admins can do this!"
@@ -232,12 +252,10 @@ const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if(user?.role !== "Admin") {
-        return res.status(401).json({
-            status: "Fail",
-            message: "Unauthorized, only Admins can do this!"
-        });
+    if(user?.role === "User") {
+        
     }
+
 
     try {
         const id = req.params.id;

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Blog, { IBlog } from "../models/blog";
 import User from "../models/user";
+import cloudinary from "cloudinary";
+
 
 interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
     user?: any;
@@ -10,20 +12,34 @@ interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
 // create blog
 const httpCreateBlog = async (req: Request, res: Response): Promise<void> => {
     const { title, author, content } = req.body;
+
+    const imageUrl = req.file ? req.file.path : null;
+
     if (!title || !author || !content) {
         res.status(400).json({ error: "Missing required fields" });
         return;
     }
 
     try {
-        const blog: IBlog = new Blog({
-            title,
-            author,
-            content
-        });
-    
-        await blog.save();
-        res.status(201).json({ message: "Blog created successfully!", data: blog });
+        if (imageUrl){
+            const cloudinaryResponse = await cloudinary.v2.uploader.upload(imageUrl);
+            const blog: IBlog = new Blog({
+                title,
+                author,
+                content,
+                imageUrl: cloudinaryResponse.secure_url
+            });
+            await blog.save();
+            res.status(201).json({ message: "Blog created successfully!", data: blog });
+        } else {
+            const blog: IBlog = new Blog({
+                title,
+                author,
+                content
+            });
+            await blog.save();
+            res.status(201).json({ message: "Blog created successfully!", data: blog });
+        }
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
@@ -44,6 +60,7 @@ const httpGetSingleBlog = async (req: Request, res: Response): Promise<void> => 
     try {
         const blogId = req.params.id;
         const blog: IBlog | null = await Blog.findById(blogId);
+
         if (!blog) {
             res.status(404).json({ error: "Blog not found" });
             return;
@@ -60,7 +77,7 @@ const httpUpdateSingleBlog = async (req: AuthenticatedRequest, res: Response): P
     const userId = req.user;
     const user = await User.findOne({ _id: userId});
 
-    if (user?.role == "User") {
+    if (user!.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can update" });
         return;
     }

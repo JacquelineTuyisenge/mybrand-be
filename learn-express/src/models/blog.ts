@@ -5,6 +5,7 @@ export interface IBlog extends Document {
     title: string;
     author: string;
     content: string;
+    imageUrl?: string;
     blogComments: CommentObject[];
     blogLikes: Array<mongoose.Types.ObjectId>;
 }
@@ -23,6 +24,9 @@ const BlogSchema: Schema = new Schema(
     content: {
       type: String,
       required: true
+    },
+    imageUrl: {
+      type: String
     },
     blogComments: [{ // Define blogComments as an array of objects containing author and comment properties
       author: { type: String },

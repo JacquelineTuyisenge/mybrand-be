@@ -5,7 +5,7 @@ import authenticateLogin from '../middlewares/authentication';
 
 const UserRouter = express.Router();
 
-UserRouter.post('/', isValidUser, httpUsers.createUser);
+UserRouter.post('/register', isValidUser, httpUsers.createUser);
 UserRouter.post('/login', httpUsers.logIn);
 UserRouter.get('/loggedInUser', authenticateLogin, httpUsers.loggedInUser);
 UserRouter.get('/', httpUsers.getAllUsers);

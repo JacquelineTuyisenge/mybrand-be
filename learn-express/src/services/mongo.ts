@@ -5,11 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 mongoose.connection.on("open", () => {
-    console.info("Database Connected")
+    console.info(JSON.stringify({ message: "portfolio Database Connected" }))
 }) // events
 
 mongoose.connection.on("close", () => {
-    console.info("Something went wrong") // when connection is not there
+    console.info(JSON.stringify({ message: "Something went wrong" })) // when connection is not there("Something went wrong") // when connection is not there
 }) 
 
 const mongoConnect = async () => { 

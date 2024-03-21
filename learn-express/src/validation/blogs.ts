@@ -5,6 +5,9 @@ const BlogSchema =  Joi.object({ // means we are going to validate an object
     title: Joi.string().required().messages({
         "string.empty": "Title of Blog is required!"
     }),
+    imageUrl: Joi.string().messages({
+        
+    }),
     author: Joi.string().required().messages({
         "string.empty": "Blog's Author is required!"
     }),
