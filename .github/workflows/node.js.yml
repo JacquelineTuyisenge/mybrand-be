@@ -8,7 +8,13 @@ on:
     branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
-
+env: 
+    TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+    ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
+    CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
+    CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+    CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+    
 jobs:
   build:
 
