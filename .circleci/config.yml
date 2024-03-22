@@ -13,7 +13,7 @@ jobs:
           command: npm install
       - save_cache:
           paths:
-            - node_modules
+            - ./node_modules
           key: npm-deps-{{ checksum "learn-express/package-lock.json" }} # added a space after {{ checksum }}
       # Replace this with a real test runner invocation
       - run:
