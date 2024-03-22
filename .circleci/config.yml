@@ -8,7 +8,7 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
-      -run:
+      - run:
           name: Install npm dependencies
           command: npm install
       # Replace this with a real test runner invocation
