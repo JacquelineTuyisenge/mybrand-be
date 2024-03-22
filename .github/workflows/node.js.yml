@@ -33,8 +33,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Install Dependencies
-      run: cd learn-express && npm ci
+      run: npm ci
     - name: Build
-      run: cd learn-express && npm run build --if-present
+      run: npm run build --if-present
     - name: Test
-      run: cd learn-express && npm test
+      run: npm test
