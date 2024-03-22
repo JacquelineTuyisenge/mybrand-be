@@ -205,7 +205,7 @@ const updateUser = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if(user?.role === "User") {
+    if(user?.role !== "Admin") {
         return res.status(401).json({
             status: "Fail",
             message: "Unauthorized, only Admins can do this!"
@@ -252,7 +252,11 @@ const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if(user?.role === "User") {
+    if(user?.role !== "Admin") {
+        return res.status(401).json({
+            status: "Fail",
+            message: "Unauthorized, only Admins can do this!"
+        });
         
     }
 

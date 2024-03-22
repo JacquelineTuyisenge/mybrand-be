@@ -38,7 +38,7 @@ const httpGetAllQuerries = async (req: AuthenticatedRequest, res: Response): Pro
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if (user?.role === "User") {
+    if (user?.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can do this" });
         return;
     }
@@ -66,7 +66,7 @@ const httpGetQuerry = async (req: AuthenticatedRequest, res: Response): Promise<
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if (user?.role === "User") {
+    if (user?.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can do this" });
         return;
     }
@@ -105,7 +105,7 @@ const httpUpdateQuerry = async (req: AuthenticatedRequest, res: Response): Promi
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if (user?.role === "User") {
+    if (user?.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can do this" });
         return;
     }
@@ -152,7 +152,7 @@ const httpDeleteQuerry = async (req: AuthenticatedRequest, res: Response): Promi
     const userId = req.user;
 
     const user = await User.findOne({ _id: userId });
-    if (user?.role === "User") {
+    if (user?.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can do this" });
         return;
     }

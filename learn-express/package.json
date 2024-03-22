@@ -5,9 +5,10 @@
   "main": ".src/index.ts",
   "scripts": {
     "start": "node src/index.ts",
-    "dev": "ts-node-dev ./src/index.ts",
-    "test": "jest --watchAll --no-cache --detectOpenHandles",
-    "test:ci": "jest --coverage"
+    "dev": "ts-node-dev src/index.ts",
+    "test": "jest --no-cache --detectOpenHandles",
+    "test-test": "jest --watchAll --no-cache --detectOpenHandles",
+    "test:ci": "jest --detectOpenHandles --coverage"
   },
   "keywords": [],
   "author": "",
