@@ -32,6 +32,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - run: cd learn-express && npm ci
+    - run: cd learn-express &&  npm run build --if-present
+    - run: cd learn-express && npm test
