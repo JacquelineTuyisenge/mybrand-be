@@ -8,9 +8,16 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
+      - restore_cashe:
+          keys:
+            -npm-deps-{{ checksum "package-lock.json" }}
       - run:
           name: Install npm dependencies
           command: npm install
+      - save_cashe:
+          paths:
+            - node_modules
+          key: npm-deps-{{checksum "package-lock.json" }}
       # Replace this with a real test runner invocation
       - run:
           name: Run tests
