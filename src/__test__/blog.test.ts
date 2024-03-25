@@ -18,7 +18,7 @@ console.log = jest.fn();
 const secretKey = "cxtyhjniuytrdgvzjbcdsiottrdxcvbnm"; 
 
 let userId = mongoose.Types.ObjectId;
-const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NWZjMjAxNzA0MzRlM2JjYzQzZjc2YzAiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MTEwMjIxMzksImV4cCI6MTcxMTAyMjczOX0.pl-5fsvoY-qHtWaaPSrzkIRF2zSHCfkD3GchZiIChQc";
+const adminAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDFkYTNmYmI0YjYyZTAyNmVjN2M5OCIsImZ1bGxOYW1lIjoiQWxveXNpZSBBbG95c2lvdXMiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MTEzOTc0NzksImV4cCI6MTcxMTQ4Mzg3OX0.2RCNnkoYkh9rlICH_E25bWlQLj1H3rJ7W4Z2BVC5LW4";
 
 jest.setTimeout(20000);
 
@@ -64,6 +64,7 @@ describe("Blog API", () => {
 
             const response = await request(app)
             .post("/api/blogs")
+            .set("Authorization", `Bearer ${adminAuthToken}`)
             .field("title", blogData.title)
             .field("author", blogData.author)
             .field("content", blogData.content)
@@ -112,7 +113,7 @@ describe("Blog API", () => {
             });
           });
 
-        it("should return erro when blog is not found", async () => {
+        it("should return error when blog is not found", async () => {
             const blogId = "65f25fce082bab110f67bd99";
             const {body} = await request(app)
             .get("/api/blogs/65f25fce082bab110f67bd99")
@@ -171,4 +172,4 @@ describe("Blog API", () => {
             .expect("Content-Type", /json/);
         })
    })
-})
+});

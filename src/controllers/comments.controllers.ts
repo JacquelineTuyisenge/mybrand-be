@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Comment from "../models/comments";
 import Blog, { IBlog } from "../models/blog";
 import mongoose from "mongoose";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 export interface CommentObject {
     author: string;
@@ -11,6 +12,11 @@ export interface CommentObject {
 const httpAddComment = async (req: Request, res: Response): Promise<void> => {
     try {
         const id = req.params.id;
+
+        const token:any = req.headers.authorization?.split(" ")[1];
+        const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+
+        const commenter = decoded.fullName;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             res.status(400).json({ error: "Invalid blog ID" });
@@ -25,7 +31,7 @@ const httpAddComment = async (req: Request, res: Response): Promise<void> => {
         }
 
         const newComment = new Comment({
-            author: req.body.author,
+            author: commenter,
             comment: req.body.comment,
             blog_id: id
         });
@@ -33,9 +39,10 @@ const httpAddComment = async (req: Request, res: Response): Promise<void> => {
         const commentData = await newComment.save();
 
         blog.blogComments.push({
-            author: commentData.author,
+            author: commenter,
             comment: commentData.comment
-        } as CommentObject);
+        });
+        // as CommentObject);
 
         await blog.save();
 
