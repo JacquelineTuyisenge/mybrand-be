@@ -1,7 +1,7 @@
 {
   "name": "learn-express",
   "version": "1.0.0",
-  "description": "",
+  "description": "This repository contain the backend Of my portfolio",
   "main": ".src/index.ts",
   "scripts": {
     "start": "node src/index.ts",

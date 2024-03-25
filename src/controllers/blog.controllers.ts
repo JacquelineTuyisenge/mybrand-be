@@ -116,6 +116,8 @@ const httpDeleteSingleBlog = async (req: AuthenticatedRequest, res: Response): P
     try {
         const blogId = req.params.id;
         const deletedBlog = await Blog.findByIdAndDelete(blogId);
+        
+
         if (!deletedBlog) {
             res.status(404).json({ error: "Blog not found" });
             return;

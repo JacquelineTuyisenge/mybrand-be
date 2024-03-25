@@ -63,7 +63,7 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
 
 const logIn = async (req: Request, res: Response) => {
     // const { email, password } = req.body;
-    //if user is there
+    //if user is there, check if password matches
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {

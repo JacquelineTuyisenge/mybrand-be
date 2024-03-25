@@ -10,6 +10,7 @@ const isValidUser = (req:Request, res:Response, next:Function) => {
         message: error.details[0].message
       })
     }
+  
     try {
       next();
     } catch (error) {
