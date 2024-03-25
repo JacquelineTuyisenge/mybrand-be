@@ -57,7 +57,7 @@
     
             // Assert that the response contains the expected error message
             expect(response.body).toStrictEqual({
-                status: "error",
+                status: 400,
                 message: "Email test@example.com already exists!"
             });
         });

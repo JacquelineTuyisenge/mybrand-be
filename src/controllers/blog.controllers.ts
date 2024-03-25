@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Blog, { IBlog } from "../models/blog";
 import User from "../models/user";
 import cloudinary from "cloudinary";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 
 interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
@@ -77,7 +78,11 @@ const httpUpdateSingleBlog = async (req: AuthenticatedRequest, res: Response): P
     const userId = req.user;
     const user = await User.findOne({ _id: userId});
 
-    if (user!.role !== "Admin") {
+    const token:any = req.headers.authorization?.split(" ")[1]; 
+
+    const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+
+    if (decoded?.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can update" });
         return;
     }
@@ -108,7 +113,11 @@ const httpDeleteSingleBlog = async (req: AuthenticatedRequest, res: Response): P
     const userId = req.user;
     const user = await User.findOne({ _id: userId});
 
-    if (user?.role !== "Admin") {
+    const token:any = req.headers.authorization?.split(" ")[1]; 
+
+    const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+
+    if (decoded?.role !== "Admin") {
         res.status(401).json({ error: "Unauthorized, only Admins can delete" });
         return;
     }

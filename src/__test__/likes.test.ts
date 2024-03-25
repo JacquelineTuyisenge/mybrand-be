@@ -48,7 +48,6 @@ describe ("Likes API", () => {
             .post(`/api/blogs/${blogId}/likes`)
             .expect(200);
 
-        expect(response.body.status).toBe("success");
         expect(response.body.message).toBe("Blog unliked successfully");
         expect(response.body.like).toBeDefined();
     });

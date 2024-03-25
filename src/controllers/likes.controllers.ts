@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import Like from "../models/likes";
 import mongoose from "mongoose";
 import Blog, { IBlog } from "../models/blog";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 const like = async (req: Request, res: Response) => {
+
     const blogId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(blogId)) {
@@ -52,7 +54,7 @@ const like = async (req: Request, res: Response) => {
             await blog.save();
 
             return res.status(200).json({
-                status: "success",
+                status: 200,
                 message: "Blog unliked successfully",
                 like: blogLike
             });

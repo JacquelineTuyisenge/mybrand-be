@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Querry from "../models/querries";
 import User from "../models/user";
+import jwt from "jsonwebtoken";
+import { JwtPayload } from "jsonwebtoken";
 
 interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
     user?: any;
@@ -23,9 +25,8 @@ export const httpAddQuerries = async (req: Request, res: Response): Promise<void
             querry: querry
         });
     } catch (error) {
-        console.error(error);
         res.status(500).json({
-            status: "error",
+            status: 500,
             message: "Something went wrong"
         });
     }
@@ -37,8 +38,13 @@ const httpGetAllQuerries = async (req: AuthenticatedRequest, res: Response): Pro
 
     const userId = req.user;
 
+    const token:any = req.headers.authorization?.split(" ")[1]; 
+
+    const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+
     const user = await User.findOne({ _id: userId });
-    if (user?.role !== "Admin") {
+
+    if (decoded?.role !== "Admin") {
         console.log(user?.role);
         res.status(401).json({ error: "Unauthorized, only Admins can do this" });
         return;

@@ -5,7 +5,7 @@ import authCheck from '../middlewares/authentication';
 
 const commentRouter = express.Router();
 
-commentRouter.post("/:id/comments", authCheck.authenticateLogin, isValidComment, httpComment.httpAddComment)
+commentRouter.post("/:id/comments", authCheck.authLogin, isValidComment, httpComment.httpAddComment)
 commentRouter.get("/:id/comments", httpComment.httpGetComments )
 
 export default commentRouter;

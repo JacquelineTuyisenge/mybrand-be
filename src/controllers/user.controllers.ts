@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
 import User from '../models/user';
 import bcrypt from 'bcryptjs';
-import { generateAccessToken } from '../security/accessToken';
+import jwt from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
 interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
     user?: any;
@@ -9,32 +12,25 @@ interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
 
 // create user/sign up
 const createUser = async (req: Request, res: Response): Promise<void> => {
-    // const { fullName, email, password, confirmPassword, role } = req.body;
-    // check if user is already logged in
-    // const user = await User.findOne({ email: req.body.email });
-
-    // if (user) {
-    //     res.status(400).json({
-    //         status: 'error',
-    //         message: `email ${req.body.email} already exist!`
-    //     });
-    // }
 
     try {
+
+        const user = req.body;
+
         const userExists = await User.findOne({ email: req.body.email });
 
         if (userExists) {
             res.status(400).json({
-                status: 'error',
+                status: 400,
                 message: `Email ${req.body.email} already exists!`
             });
             return;
         }
         // When a new user signs up, their password is hashed using bcrypt for security
-        const salt = await bcrypt.genSalt();
+
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
         const hashedConfirmPassword = await bcrypt.hash(req.body.confirmPassword, salt);
-        // const user = await user.create({})
 
         // hashed password is stored along with other user details in the database
         const newUser = new User({
@@ -49,56 +45,68 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
 
 
         res.status(201).json({
-            status: "Success",
-            message: "User creation is successful!"
+            status: 201,
+            message: "User created successfully!"
         });
     } catch(error) {
         console.log(error);
+        
         res.status(500).json({
-            status: 'Fail',
+            status: 500, 
             message: 'Something went wrong!'
         });
     }
 };
 
 const logIn = async (req: Request, res: Response) => {
-    // const { email, password } = req.body;
-    //if user is there, check if password matches
-    const user = await User.findOne({ email: req.body.email });
+    const {email, password} = req.body;
 
-    if (!user) {
-        return res.status(400).json({
-          status: "Fail",
-          message: "Wrong credentials. Please try again!",
+    if(!(email && password)){
+        res.status(400).json({
+            message: "All fields must exist"
+        });
+    } 
+    // if user exist
+    const userAvailable = await User.findOne({ email: req.body.email });
+
+    if (!userAvailable) {
+        return res.status(409).json({
+         status: 409,
+          message: "Wrong credentials. Please register!",
         });
       }
     //  compare the provided password with the hashed password stored in the database.
-    const isPasswordTrue = user ? await bcrypt.compare(req.body.password, user.password) : false;
+    const isMatch = userAvailable ? await bcrypt.compare(req.body.password, userAvailable.password) : false;
 
-    if (!isPasswordTrue) {
-    // If user is not found or password doesn't match
+    if (!isMatch) {
+    
         res.status(404).json({
-            status: 'error',
+            status: 404,
             message: 'Wrong credentials, try again!'
         });
     }
 
     try {
-        const token = generateAccessToken(user._id, user.role);
+        // generateAccessToken(user._id, user.role);
+        const secretKey = process.env.ACCESS_TOKEN_KEY!;
 
+        const token = jwt.sign(
+            {
+                id: userAvailable._id,
+                role: userAvailable.role
+            },
+            secretKey as string,
+            { expiresIn: '1d' }
+        );
 
         res.status(200).json({
-            status: "Success",
-            message: "user loggin is successful!",
+            message: "user logged in successfully!",
             token: token
         });
-    } catch (error){
-        console.error(error)
-        res.status(500).json({
-            status: "Error",
-            message: "Something went wrong!"
-        });
-    }
+    } catch(error){
+        console.error(error);
+           res.status(500).json({message: error});
+       }
 };
 
 
@@ -141,10 +149,13 @@ const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
 
         console.log("Decoded user role:", req.user?.role);
         
+        const token:any = req.headers.authorization?.split(" ")[1]; 
+
+        const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
         const user = await User.findOne({ _id: req.user});
-        if (user?.role !== "Admin") {
+        if (decoded?.role !== "Admin") {
             return res.status(401).json({
-                status: "Fail",
+                status: 401,
                 message: "Unauthorized, only Admins can do this!"
             });
         }
@@ -169,7 +180,11 @@ const getSingleUser = async (req: AuthenticatedRequest, res: Response) => {
 
     try {
         const user = await User.findOne({ _id: req.user});
-        if (user?.role !== "Admin") {
+        const token:any = req.headers.authorization?.split(" ")[1]; 
+
+        const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+
+        if (decoded?.role !== "Admin") {
             return res.status(401).json({
                 status: "Fail",
                 message: "Unauthorized, only Admins can do this!"

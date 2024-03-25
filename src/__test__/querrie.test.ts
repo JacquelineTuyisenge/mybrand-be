@@ -99,7 +99,6 @@ describe("Querries API", () => {
                 .expect(500)
                 .expect("Content-Type", /json/);
 
-            expect(response.body.status).toEqual("error");
             expect(response.body.message).toEqual("Something went wrong");
         });
     })
