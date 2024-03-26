@@ -9,25 +9,31 @@ export interface CommentObject {
     comment: string;
 }
 // add comment
-const httpAddComment = async (req: Request, res: Response): Promise<void> => {
+const httpAddComment = async (req: Request, res: Response): Promise<any>=> {
     try {
         const id = req.params.id;
 
-        const token:any = req.headers.authorization?.split(" ")[1];
-        const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+        const token = req.headers.authorization?.split(" ")[1];
+        const decoded = jwt.verify(String(token), process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
+
+        if(!token || token == undefined){
+            return res.status(401).json({
+                message: "UnAuthorized!"
+            })
+        }
 
         const commenter = decoded.fullName;
 
+        console.log(`here is the commenter : ${commenter}`);
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            res.status(400).json({ error: "Invalid blog ID" });
-            return;
+            return res.status(400).json({ error: "Invalid blog ID" });
         }
 
-        const blog: IBlog | null = await Blog.findById(id);
+        const blog = await Blog.findById(id);
 
         if (!blog) {
-            res.status(404).json({ error: "Blog not found" });
-            return;
+            return res.status(404).json({ error: "Blog not found" });
         }
 
         const newComment = new Comment({
@@ -74,7 +80,7 @@ const httpGetComments = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        const blog: IBlog | null = await Blog.findById(blogId);
+        const blog = await Blog.findById(blogId);
 
         if (!blog) {
             res.status(404).json({ 
@@ -84,7 +90,7 @@ const httpGetComments = async (req: Request, res: Response): Promise<void> => {
         }
 
         res.status(200).json({
-            status: "success",
+            status: "200",
             message: "Comments retrieved successfully",
             comments: blog.blogComments
         });
@@ -92,7 +98,6 @@ const httpGetComments = async (req: Request, res: Response): Promise<void> => {
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            status: "Fail",
             message: "Something went wrong"
         });
     }

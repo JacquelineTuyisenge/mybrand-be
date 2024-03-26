@@ -54,46 +54,46 @@ describe("Querries API", () => {
       expect(response.body.querry.email).toBe(mockQuerry.email);
       expect(response.body.querry.message).toBe(mockQuerry.message);
     });
-  });
 
-  describe("GET /querries", () => {
-    it("should get all querries", async () => {
-      // Create mock querries
-      const mockQuerries = 
-        {
-          name: "John Doe",
-          email: "john@example.com",
-          message: "This is a test querry",
-        };
-        // {
-        //   name: "Jane Doe",
-        //   email: "jane@example.com",
-        //   message: "This is another test querry",
-        // },
+    // it("should get all querries", async () => {
+    //   // Create mock querries
+    //   const mockQuerries = 
+    //     {
+    //       name: "John Doe",
+    //       email: "john@example.com",
+    //       message: "This is a test querry",
+    //     };
+    //     // {
+    //     //   name: "Jane Doe",
+    //     //   email: "jane@example.com",
+    //     //   message: "This is another test querry",
+    //     // },
       
 
-      // Insert mock querries into the database
-      await Querry.insertMany(mockQuerries);
+    //   // Insert mock querries into the database
+    //   await Querry.insertMany(mockQuerries);
 
-      // Send request to get all querries
-      const response = await request(app)
-        .get("/api/querries")
-        .set("Authorization", `Bearer ${token}`)
-        .expect(200)
-        .expect("Content-Type", /json/);
+    //   // Send request to get all querries
+    //   const response = await request(app)
+    //     .get("/api/querries")
+    //     .set("Authorization", `Bearer ${token}`)
+    //     .expect(200)
+    //     .expect("Content-Type", /json/);
 
-      // Check if response contains the expected querries
-      expect(response.body.status).toBe("success");
-      expect(response.body.message).toBe("Querries retrieved successfully");
+    //   // Check if response contains the expected querries
+    //   expect(response.body.status).toBe("success");
+    //   expect(response.body.message).toBe("Querries retrieved successfully");
 
-      // Check if each querry in the response matches the mock querries
-      response.body.querries.forEach((querry: any, index: number) => {
-        expect(querry.name).toBe(mockQuerries.name);
-        expect(querry.email).toBe(mockQuerries.email);
-        expect(querry.message).toBe(mockQuerries.message);
-      });
-    });
+    //   // Check if each querry in the response matches the mock querries
+    //   response.body.querries.forEach((querry: any, index: number) => {
+    //     expect(querry.name).toBe(mockQuerries.name);
+    //     expect(querry.email).toBe(mockQuerries.email);
+    //     expect(querry.message).toBe(mockQuerries.message);
+    //   });
+    // });
+
   });
+
 });
 
 

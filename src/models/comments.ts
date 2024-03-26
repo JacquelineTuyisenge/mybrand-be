@@ -9,8 +9,10 @@ const commentsSchema = new Schema({
     },
     blog_id: {
         type: Schema.Types.ObjectId,
-        ref: "Blog",
-        required: true
+        ref: "Blog"
+    },
+    author: {
+        type: String
     }
 },
     { timestamps: true }

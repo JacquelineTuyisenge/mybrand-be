@@ -32,15 +32,16 @@ const httpCreateBlog = async (req: Request, res: Response): Promise<void> => {
             });
             await blog.save();
             res.status(201).json({ message: "Blog created successfully!", data: blog });
-        } else {
-            const blog: IBlog = new Blog({
-                title,
-                author,
-                content
-            });
-            await blog.save();
-            res.status(201).json({ message: "Blog created successfully!", data: blog });
-        }
+        } 
+        // else {
+        //     const blog: IBlog = new Blog({
+        //         title,
+        //         author,
+        //         content
+        //     });
+        //     await blog.save();
+        //     res.status(201).json({ message: "Blog created successfully!", data: blog });
+        // }
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
     }
