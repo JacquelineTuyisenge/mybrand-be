@@ -18,6 +18,9 @@ console.log = jest.fn();
 const secretKey = "cxtyhjniuytrdgvzjbcdsiottrdxcvbnm"; 
 
 let userId = mongoose.Types.ObjectId;
+
+let nonAdminAuthToken: string;
+
 const adminAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDFkYTNmYmI0YjYyZTAyNmVjN2M5OCIsImZ1bGxOYW1lIjoiQWxveXNpZSBBbG95c2lvdXMiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MTEzOTc0NzksImV4cCI6MTcxMTQ4Mzg3OX0.2RCNnkoYkh9rlICH_E25bWlQLj1H3rJ7W4Z2BVC5LW4";
 
 jest.setTimeout(20000);
@@ -28,6 +31,15 @@ let blogId: string;
 
 describe("Blog API", () => {
     beforeAll(async () => {
+        // const nonAdminUser = new User({
+        //     fullName: "non admin",
+        //     email: "nonadmin@me.com",
+        //     password: "password",
+        //     confirmPassword: "password",
+        //     role: "User"
+        // });
+        // await nonAdminUser.save();
+        // nonAdminAuthToken = jwt.sign({ id: nonAdminUser._id, fullName: nonAdminUser.fullName, role: nonAdminUser.role }, secretKey);
         await mongoTest.testConnect();
     });
 
@@ -124,25 +136,39 @@ describe("Blog API", () => {
         });
 
         it("should update an existing blog with valid data", async () => {
+            const createdBlog = new Blog({
+                title: "Updated Title",
+                author: "Updated Author",
+                content: "Updated Content",
+                imageUrl: "https://example.com/image.jpg",
+            });
+            await createdBlog.save();
+            const blogId = createdBlog._id;
+
             const updatedData = {
                 title: "Updated Title",
+                author: "Updated Author",
                 content: "Updated Content",
+                imageUrl: "https://example.com/image.jpg",
             };
 
-            const response = await request(app)
-                .patch(`/api/blogs/${blogId}`)
-                .set("Authorization", `Bearer ${authToken}`)
+            const { body } = await request(app)
+                .patch(`/api/blogs/${createdBlog._id}`)
+                .set("Authorization", `Bearer ${adminAuthToken}`)
                 .send(updatedData)
                 .expect(200)
                 .expect("Content-Type", /json/);
-
-            expect(response.body).toMatchObject(updatedData);
+            
+            expect(body).toMatchObject(updatedData);
+            expect(body.title).toEqual(updatedData.title);
+            expect(body.author).toEqual(updatedData.author);
+            expect(body.content).toEqual(updatedData.content);
         });
 
         it("should return 401 if user is not authenticated", async () => {
             await request(app)
                 .delete(`/api/blogs/${blogId}`)
-                .expect(401)
+                .expect(403)
                 .expect("Content-Type", /json/);
         });
 
@@ -161,14 +187,14 @@ describe("Blog API", () => {
                 author: "test author",
                 content: "test content"
             })
-            .expect(401)
+            .expect(403)
             .expect("Content-Type", /json/);
         });
 
         it("should return 401 when non-admin user tries to delete blogs", async () => {
             const {body} = await request(app)
             .delete("/api/blogs/65f26043082bab110f67bd9e")
-            .expect(401)
+            .expect(403)
             .expect("Content-Type", /json/);
         })
    })

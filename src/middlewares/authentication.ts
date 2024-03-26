@@ -32,34 +32,6 @@ const isAdmin = async (
   }catch(err){
     return res.status(401).json({message: "UnAuthorized!"});
   }
-  // try {
-  //   if (!req.header("Authorization"))
-  //     return res.status(401).json({ message: "Please sign in" });
-
-  //   const token = req.header("Authorization")?.split(" ")[1] as string;
-
-  //   const ACCESS_TOKEN_KEY = process.env.ACCESS_TOKEN_KEY;
-  //   // const decoded = verifyAccessToken(token) as JwtPayload;
-  //   const decoded: any = jwt.verify(token, ACCESS_TOKEN_KEY || "thgvbdiuyfwgc") as JwtPayload;
-
-  //   if (decoded) {
-  //     req.UserId = decoded._id;
-  //     const id = req.UserId;
-  //     const user = await User.findById(id);
-  //     if (!user) {
-  //       return res.status(404).json({ message: "user not found" });
-  //     }
-  //     if (user.role !== "Admin") {
-  //       return res.status(406).json({ message: "Only for Admin" });
-  //     }
-  //     next();
-  //   }
-  // } catch (error) {
-  //   if (error instanceof TokenExpiredError) {
-  //     return res.status(401).json({ message: "Token expired" });
-  //   }
-  //   return res.status(400).json({ status: "400", message: "Bad Request" });
-  // }
 };
 
 const authLogin = async (

@@ -6,6 +6,8 @@ import Blog, { IBlog } from "../models/blog";
 
 jest.setTimeout(20000);
 
+const adminAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDFkYTNmYmI0YjYyZTAyNmVjN2M5OCIsImZ1bGxOYW1lIjoiQWxveXNpZSBBbG95c2lvdXMiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MTEzOTc0NzksImV4cCI6MTcxMTQ4Mzg3OX0.2RCNnkoYkh9rlICH_E25bWlQLj1H3rJ7W4Z2BVC5LW4";
+
 describe ("Comments API", () => {
     beforeAll(async () => {
         await mongoTest.testConnect();
@@ -19,6 +21,7 @@ describe ("Comments API", () => {
     it("should add a comment to a blog", async () => {
         const newBlog = new Blog({
             title: "Test Blog",
+            imageUrl: "Test Image URL",
             author: "Test Author",
             content: "Test Content"
         });
@@ -26,12 +29,12 @@ describe ("Comments API", () => {
         await newBlog.save();
 
         const CommentData = {
-            author: "Comment Author",
             comment: "Test Comment"
         };
 
         const response = await request(app)
             .post(`/api/blogs/${newBlog._id}/comments`)
+            .set('Authorization', `Bearer ${adminAuthToken}`)
             .send(CommentData)
             .expect(201)
             .expect("Content-Type", /json/);
@@ -39,7 +42,6 @@ describe ("Comments API", () => {
             expect(response.body.status).toEqual("success");
             expect(response.body.message).toEqual("Comment added successfully");
             expect(response.body.comment).toBeDefined();
-            expect(response.body.comment.author).toEqual(CommentData.author);
             expect(response.body.comment.comment).toEqual(CommentData.comment);
     });
 

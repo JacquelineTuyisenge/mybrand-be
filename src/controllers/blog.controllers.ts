@@ -83,7 +83,7 @@ const httpUpdateSingleBlog = async (req: AuthenticatedRequest, res: Response): P
     const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
 
     if (decoded?.role !== "Admin") {
-        res.status(401).json({ error: "Unauthorized, only Admins can update" });
+        res.status(403).json({ error: "Forbidden, only Admins can update" });
         return;
     }
 
@@ -118,7 +118,7 @@ const httpDeleteSingleBlog = async (req: AuthenticatedRequest, res: Response): P
     const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
 
     if (decoded?.role !== "Admin") {
-        res.status(401).json({ error: "Unauthorized, only Admins can delete" });
+        res.status(403).json({ error: "Unauthorized, only Admins can delete" });
         return;
     }
 
