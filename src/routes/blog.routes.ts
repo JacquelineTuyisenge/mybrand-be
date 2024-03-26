@@ -11,7 +11,7 @@ const upload = multer({ dest: "./src/uploads" });
 
 
 // get all blogs
-blogRouter.get("/", httpBlog.httpGetBlog);
+blogRouter.get("/allblogs", httpBlog.httpGetBlog);
 
  // create blog, also here we used isValid
 blogRouter.post("/", upload.single("image"), isValid, authCheck.isAdmin, httpBlog.httpCreateBlog);

@@ -2,9 +2,9 @@
     "openapi": "3.0.0",
     "info": {
       "version": "1.0.0",
-      "description": "This API serves as the backend for a blog/portfolio application, providing CRUD (Create, Read, Update, Delete) functionalities for managing blogs, handling user authentication (login and register), allowing users to like blogs, create comments, and send queries.",
+      "description": "This API serves as the backend for my blog in portfolio application. it provides CRUD (Create, Read, Update, Delete) functionalities for managing blogs, handling user authentication (login and register), allowing users to like blogs, create comments, and send queries.",
   
-      "title": "My Brand API Documentation."
+      "title": "My Brand API Documentation with Swagger."
     },
     "servers": [
       {
@@ -144,7 +144,7 @@
             "fullName": {
               "type": "string",
               "description": "name",
-              "example": "KEREN Shallon"
+              "example": "Jacky Elyne"
             },
             "email": {
               "type": "string",
@@ -155,13 +155,18 @@
             "password": {
               "type": "string",
               "description": "Password",
-              "example": "Password1234??"
+              "example": "Password12?"
             },
             "confirmPassword": {
                 "type": "string",
                 "description": "Password",
-                "example": "Password1234??"
-              }
+                "example": "Password12?"
+              },
+            "role": {
+              "type": "string",
+              "description": "Role",
+              "example": "Admin"
+            }
           }
         },
         "UserLogin": {
@@ -176,11 +181,11 @@
             "password": {
               "type": "string",
               "description": "your password",
-              "example": "password123??"
+              "example": "password12?"
             }
           }
         },
-  
+
         "Blogs": {
           "required": ["title","author", "content", "imageUrl"],
           "type": "object",
@@ -188,7 +193,7 @@
             "title": {
               "type": "string",
               "description": "blog title",
-              "example": "cyberTrack"
+              "example": "spotify"
             },
             "author": {
               "type": "string",
@@ -229,11 +234,38 @@
               "type": "string",
               "description": "Comment description",
               "example": "Good blog"
-            },
-           "author": {
+            }
+          }
+        },
+        "Like": {
+          "required": ["user id"],
+          "type": "object",
+          "properties": {
+            "userId": {
               "type": "string",
-              "description": "Comment author",
-              "example": "Jacky"
+              "description": "user id",
+              "example": "1"
+            }
+          }
+        },
+        "Queries": {
+          "required": ["name", "email", "message"],
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "name",
+              "example": "Shallon"
+            },
+            "email": {
+              "type": "string",
+              "description": "Email",
+              "example": "example@email.com"
+            },
+            "message": {
+              "title": "string",
+              "description": "message",
+              "example": "meet me"
             }
           }
         }
@@ -253,7 +285,10 @@
         "name": "Comments",
         "description": "Read and create comment on blog"
       },
-      { "name": "likes", "description": "like and unlike blog" }
+      { "name": "likes", 
+        "description": "like and unlike blog" 
+      },
+      { "name": "Queries", "description": "Send  and get queries" }
     ],
     "schemes": ["http", "https"],
     "security": [
@@ -328,10 +363,11 @@
                   "type": "object",
                   "properties": {
                     "title": { "type": "string" },
-                    "description": { "type": "string" },
-                    "coverImage": { "type": "string", "format": "binary" }
+                    "author": { "type": "string" },
+                    "content": { "type": "string" },
+                    "image": { "type": "string", "format": "binary" }
                   },
-                  "required": ["title", "description", "coverImage"]
+                  "required": ["title", "author", "content", "image"]
                 }
               }
             }
@@ -350,10 +386,10 @@
         }
       },
   
-      "/blogs/all/": {
+      "/blogs/allblogs/": {
         "get": {
           "tags": ["Blogs"],
-          "summary": "Get blogs",
+          "summary": "Get all blogs",
           "description": "Get all blogs",
           "responses": {
             "200": {
@@ -459,7 +495,7 @@
           }
         }
       },
-      "/blogs/{ID}/comments": {
+      "/blogs/{ID}/comments/allcomments": {
         "get": {
           "tags": ["Comments"],
           "summary": "Blog comments",
@@ -486,7 +522,7 @@
           }
         }
       },
-      "/blogs/{ID}/comments/add": {
+      "/blogs/{ID}/comments/addcomment": {
         "post": {
           "tags": ["Comments"],
           "summary": "Create comment",
@@ -523,6 +559,89 @@
             "401": {
               "$ref": "#/components/responses/Unauthorized"
             }
+          }
+        }
+      },
+      "/blogs/{ID}/likes": {
+        "post": {
+          "tags": ["Likes"],
+          "summary": "Like blog",
+
+          "description": "Like blog",
+          "parameters": [
+            {
+              "name": "ID",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "default": 1
+              },
+              "description": "Blog id"
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Blog liked successfully!"
+            },
+            "400": {
+              "$ref": "#/components/responses/BadRequest"
+            },
+            "401": {
+              "$ref": "#/components/responses/UnauthorizedError"
+            },
+            "404": {
+              "$ref": "#/components/responses/NotFound"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/queries/": {
+        "post": {
+          "tags": ["Queries"],
+          "summary": "Send query",
+          "description": "Send query",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Queries"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Query submitted successfully!"
+            },
+            "400": {
+              "$ref": "#/components/responses/BadRequest"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
+          }
+        }
+      },
+      "/queries/allqueries": {
+        "get": {
+          "tags": ["Queries"],
+          "summary": "Get all queries",
+          "description": "Get all queries"
+        },
+        "responses": {
+          "200": {
+            "description": "Queries retrieved successfully."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
           }
         }
       }

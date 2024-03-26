@@ -6,6 +6,6 @@ import authCheck from '../middlewares/authentication';
 const querriesRouter = express.Router();
 
 querriesRouter.post('/', isValidQuerry, httpQuerries.httpAddQuerries);
-querriesRouter.get('/', authCheck.isAdmin, httpQuerries.httpGetAllQuerries);
+querriesRouter.get('/allquerries', authCheck.isAdmin, httpQuerries.httpGetAllQuerries);
 
 export default querriesRouter;
