@@ -7,8 +7,5 @@ const querriesRouter = express.Router();
 
 querriesRouter.post('/', isValidQuerry, httpQuerries.httpAddQuerries);
 querriesRouter.get('/', authCheck.isAdmin, httpQuerries.httpGetAllQuerries);
-// querriesRouter.get('/:id', httpQuerries.httpGetQuerry);
-// querriesRouter.patch('/:id', isValidQuerry, httpQuerries.httpUpdateQuerry);
-// querriesRouter.delete('/:id', httpQuerries.httpDeleteQuerry);
 
 export default querriesRouter;

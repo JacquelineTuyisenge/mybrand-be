@@ -98,42 +98,4 @@ const httpGetComments = async (req: Request, res: Response): Promise<void> => {
     }
 };      
 
-
-// Delete all comments for a blog
-// const httpDeleteCommentsForBlog = async (req: Request, res: Response): Promise<void> => {
-//     try {
-//         const blogId = req.params.id;
-
-//         if (!mongoose.Types.ObjectId.isValid(blogId)) {
-//             res.status(400).json({ 
-//                 status: "error",
-//                 message: "Invalid blog ID" });
-//             return;
-//         }
-
-//         // Find the blog
-//         const blog: IBlog | null = await Blog.findById(blogId);
-
-//         if (!blog) {
-//             res.status(404).json({ error: "Blog not found" });
-//             return;
-//         }
-
-//         // Delete all comments associated with the blog
-//         await Comment.deleteMany({ blog_id: blogId });
-
-//         res.status(200).json({
-//             status: "success",
-//             message: "All comments for the blog have been deleted"
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             status: "error",
-//             message: "Something went wrong"
-//         });
-//     }
-// };
-
-
 export default { httpGetComments, httpAddComment, }; // httpDeleteCommentsForBlog

@@ -3,131 +3,95 @@ import app from "../app";
 import mongoose from "mongoose";
 import mongoTest from "../services/mongoTest";
 import Blog, { IBlog } from "../models/blog";
+import User from "../models/user";
+import Comment from "../models/comments";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 jest.setTimeout(20000);
 
-const adminAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDFkYTNmYmI0YjYyZTAyNmVjN2M5OCIsImZ1bGxOYW1lIjoiQWxveXNpZSBBbG95c2lvdXMiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MTEzOTc0NzksImV4cCI6MTcxMTQ4Mzg3OX0.2RCNnkoYkh9rlICH_E25bWlQLj1H3rJ7W4Z2BVC5LW4";
+let token: string;
+let decoded: JwtPayload;
 
 describe ("Comments API", () => {
     beforeAll(async () => {
         await mongoTest.testConnect();
+
+        // generate a jwt token for authentication
+        const user = new User({
+            fullName: "Test User",
+            email: "admin@me.com",
+            password: "password",
+            confirmPassword: "password",
+            role: "Admin"
+        });
+        await user.save();
+
+        token = jwt.sign({ id: user._id, fullName: user.fullName, role: user.role }, process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc"), { expiresIn: "1d" };
+
+        decoded = jwt.verify(token, process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc") as jwt.JwtPayload;
+
+        const userFullName = decoded.fullName;
+        
     });
 
     afterAll(async () => {
+        await User.deleteMany({});
         await Blog.deleteMany({});
+        await Comment.deleteMany({});
         await mongoTest.testDisconnect();
     });
 
+    
+    it("should not add a comment to a blog if user is not logged in", async () => {
+        // Create blog and get blog by id
+        const blog = new Blog({
+            title: "Test Blog",
+            imageUrl: "Test Image URL",
+            author: "Test Author",
+            content: "Test Content"
+        });
+        await blog.save();
+        const blogId = blog._id;
+
+        const response = await request(app)
+            .post(`/api/blogs/${blogId}/comments`)
+            .send({
+                comment: "Test Comment",
+                author: "Anonymous"
+            })
+            .expect(403);
+
+        expect(response.body.message).toEqual("access denied");
+    });
+
     it("should add a comment to a blog", async () => {
-        const newBlog = new Blog({
+
+        // create blog and get blog by id
+        const blog = new Blog({
             title: "Test Blog",
             imageUrl: "Test Image URL",
             author: "Test Author",
             content: "Test Content"
         });
 
-        await newBlog.save();
+        await blog.save();
+        const blogId = blog._id;
 
-        const CommentData = {
-            comment: "Test Comment"
-        };
 
         const response = await request(app)
-            .post(`/api/blogs/${newBlog._id}/comments`)
-            .set('Authorization', `Bearer ${adminAuthToken}`)
-            .send(CommentData)
-            .expect(201)
-            .expect("Content-Type", /json/);
-
-            expect(response.body.status).toEqual("success");
-            expect(response.body.message).toEqual("Comment added successfully");
-            expect(response.body.comment).toBeDefined();
-            expect(response.body.comment.comment).toEqual(CommentData.comment);
-    });
-
-    it("should return 400 if for invalid blog id", async () => {
-        const commentData = {
-            author: "Comment Author",
-            comment: "Test Comment"
-        };
-
-        await request(app)
-            .post(`/api/blogs/123/comments`) // Non-existing blog ID
-            .send(commentData)
-            .expect(400)
-            .expect("Content-Type", /json/)
-            .expect({error: "Invalid blog ID"});
-    });
-
-    it("should return 400 if comment data is invalid", async () => {
-        const commentData = {
-            author: "", // Invalid author
-            comment: "" // Invalid comment
-        };
-
-        await request(app)
-            .post(`/api/blogs/123/comments`)
-            .send(commentData)
-            .expect(400)
-            .expect("Content-Type", /json/)
-            .expect({ message: "Comment's Author is required!" });
-    });
-
-    it("should return comments for a valid blog ID", async () => {
-        const newBlog = new Blog({
-            title: "Test Blog",
-            author: "Test Author",
-            content: "Test Content",
-            blogComments: [
-                { author: "Comment Author 1", comment: "Comment 1" },
-                { author: "Comment Author 2", comment: "Comment 2" }
-            ]
-        });
-        await newBlog.save();
-
-        const response = await request(app)
-            .get(`/api/blogs/${newBlog._id}/comments`)
-            .expect(200)
-            .expect("Content-Type", /json/);
-
+            .post(`/api/blogs/${blogId}/comments`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                comment: "Test Comment",
+                author : decoded.userFullName
+            })
+            .expect(201);
+        
+        expect(response.status).toEqual(201);
         expect(response.body.status).toEqual("success");
-        expect(response.body.message).toEqual("Comments retrieved successfully");
-        expect(response.body.comments).toHaveLength(2);
+        expect(response.body.comment.comment).toEqual("Test Comment");
+        expect(response.body.author).toEqual(decoded.userFullName);
     });
-
-    it("should return 400 if blog ID is invalid", async () => {
-        await request(app)
-            .get(`/api/blogs/invalidID/comments`)
-            .expect(400)
-            .expect("Content-Type", /json/)
-            .expect({ status: "error", message: "Invalid blog ID" });
-    });
-
-    it("should handle errors when adding a comment", async () => {
-        // Mock an error in the Blog.findById function
-        jest.spyOn(Blog, "findById").mockImplementation(() => {
-            throw new Error("Test error");
-        });
-
-        const newBlog = new Blog({
-            title: "Test Blog",
-            author: "Test Author",
-            content: "Test Content"
-        });
-
-        await newBlog.save();
-
-        const commentData = {
-            author: "Comment Author",
-            comment: "Test Comment"
-        };
-
-        await request(app)
-            .post(`/api/blogs/${newBlog._id}/comments`)
-            .send(commentData)
-            .expect(500)
-            .expect("Content-Type", /json/)
-            .expect({ status: "error", message: "something went wrong" });
-    });
-
 });

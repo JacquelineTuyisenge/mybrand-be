@@ -46,7 +46,8 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
 
         res.status(201).json({
             status: 201,
-            message: "User created successfully!"
+            message: "User created successfully!",
+            email: req.body.email
         });
     } catch(error) {
         console.log(error);
@@ -156,7 +157,7 @@ const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
         const decoded: any = jwt.verify(token,   process.env.ACCESS_TOKEN_KEY || "thgvbdiuyfwgc" ) as JwtPayload;
         const user = await User.findOne({ _id: req.user});
         if (decoded?.role !== "Admin") {
-            return res.status(401).json({
+            return res.status(403).json({
                 status: 401,
                 message: "Unauthorized, only Admins can do this!"
             });
