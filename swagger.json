@@ -10,6 +10,10 @@
       {
         "url": "http://localhost:5000/api/",
         "description": "Local server"
+      },
+      {
+        "url": "https://mybrand-be-ecx9.onrender.com",
+        "description": "production server"
       }
     ],
   
@@ -285,9 +289,6 @@
         "name": "Comments",
         "description": "Read and create comment on blog"
       },
-      { "name": "likes", 
-        "description": "like and unlike blog" 
-      },
       { "name": "Queries", "description": "Send  and get queries" }
     ],
     "schemes": ["http", "https"],
@@ -544,7 +545,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Comment"
+                  "$ref": "##/components/schemas/Comment"
                 }
               }
             }
@@ -599,7 +600,7 @@
           }
         }
       },
-      "/queries/": {
+      "/querries/": {
         "post": {
           "tags": ["Queries"],
           "summary": "Send query",

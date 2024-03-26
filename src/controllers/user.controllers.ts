@@ -98,7 +98,7 @@ const logIn = async (req: Request, res: Response) => {
                 role: userAvailable.role
             },
             secretKey as string,
-            { expiresIn: '1d' }
+            { expiresIn: '1y' }
         );
 
         res.status(200).json({

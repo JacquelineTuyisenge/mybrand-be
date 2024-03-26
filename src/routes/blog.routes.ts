@@ -3,12 +3,34 @@ import multer from "multer";
 import httpBlog from '../controllers/blog.controllers';
 import isValid from '../middlewares/blogMiddleware';
 import authCheck from "../middlewares/authentication";
+import path from 'path';
 
 
 const blogRouter = express.Router(); // specific router for blog
 
-const upload = multer({ dest: "./src/uploads" });
+// const upload = multer({ dest: "./src/uploads" });
 
+const upload = multer({
+    storage: multer.diskStorage({}),
+  fileFilter: (req, file, callback) => {
+      let ext = path.extname(file.originalname);
+  
+      if (
+        ext !== ".png" &&
+        ext !== ".jpg" &&
+        ext !== ".jpeg" &&
+        ext !== ".gif" &&
+        ext !== ".webp" &&
+        ext !== ".bmp" &&
+        ext !== ".tiff" &&
+        ext !== ".jfif" &&
+        ext !== ".tif"
+      ) {
+        return callback(null, false);
+      }
+      callback(null, true);
+    },
+  });
 
 // get all blogs
 blogRouter.get("/allblogs", httpBlog.httpGetBlog);
