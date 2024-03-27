@@ -38,5 +38,5 @@ jobs:
     - run: npm run build --if-present
     - run: npm i superagent
     - run: npm test
-    - run: npm test:ci
+    - run: npm run test:ci
     - run: npx update-badge
