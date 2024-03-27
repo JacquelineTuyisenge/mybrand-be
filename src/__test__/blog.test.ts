@@ -23,7 +23,7 @@ let nonAdminAuthToken: string;
 
 const adminAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDMzMTJmNDIxZDY4MmU5NWZhNTZmYyIsImZ1bGxOYW1lIjoiamFja3kgZWx5bmVlIiwicm9sZSI6IkFkbWluIiwiaWF0IjoxNzExNDg1MjgxLCJleHAiOjE3MTE1NzE2ODF9.gLbOQWFgHZ4U9eT9V60zJrmpbrzZWzBva5EMeqTInqo";
 
-jest.setTimeout(30000);
+jest.setTimeout(20000);
 
 let token: string;
 let blogId: string;

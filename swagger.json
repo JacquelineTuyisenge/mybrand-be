@@ -12,7 +12,7 @@
         "description": "Local server"
       },
       {
-        "url": "https://mybrand-be-ecx9.onrender.com",
+        "url": "https://mybrand-be-ecx9.onrender.com/api/",
         "description": "production server"
       }
     ],
