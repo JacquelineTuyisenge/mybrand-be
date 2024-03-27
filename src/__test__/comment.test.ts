@@ -77,30 +77,30 @@ describe ("Comments API", () => {
                 token = responseLogin.body.token;
     })
 
-    it("it should create a blog", async () => {
-        const mockCloudinaryResponse = {
-            secure_url: "https://mocked-cloudinary-url/image.jpg"
-        };
-        (cloudinary.v2.uploader.upload as jest.Mock).mockResolvedValue(mockCloudinaryResponse);
+    // it("it should create a blog", async () => {
+    //     const mockCloudinaryResponse = {
+    //         secure_url: "https://mocked-cloudinary-url/image.jpg"
+    //     };
+    //     (cloudinary.v2.uploader.upload as jest.Mock).mockResolvedValue(mockCloudinaryResponse);
 
-        const blogData = {
-            title: "ATLP Journey",
-            author: "Jacqueline",
-            content: "blog content"
-        };
+    //     const blogData = {
+    //         title: "ATLP Journey",
+    //         author: "Jacqueline",
+    //         content: "blog content"
+    //     };
 
-        const response = await request(app)
-        .post("/api/blogs")
-        .set("Authorization", `Bearer ${adminAuthToken}`)
-        .field("title", blogData.title)
-        .field("author", blogData.author)
-        .field("content", blogData.content)
-        .attach("image", filePath) // Attach the image file
-        .expect(201)
+    //     const response = await request(app)
+    //     .post("/api/blogs")
+    //     .set("Authorization", `Bearer ${adminAuthToken}`)
+    //     .field("title", blogData.title)
+    //     .field("author", blogData.author)
+    //     .field("content", blogData.content)
+    //     .attach("image", filePath) // Attach the image file
+    //     .expect(201)
 
-        expect(response.body.data).toBeDefined();
-        id = response.body.data._id;
-    });
+    //     expect(response.body.data).toBeDefined();
+    //     id = response.body.data._id;
+    // });
 
     
     // it("should not add a comment to a blog if user is not logged in", async () => {

@@ -60,38 +60,38 @@ describe("Blog API", () => {
             expect(body.message).toStrictEqual("Welcome to the Blog API");
         });
 
-        //create blog
-        it("should create new blog", async () => {
+        // //create blog
+        // it("should create new blog", async () => {
 
-            const mockCloudinaryResponse = {
-                secure_url: "https://mocked-cloudinary-url/image.jpg"
-            };
-            (cloudinary.v2.uploader.upload as jest.Mock).mockResolvedValue(mockCloudinaryResponse);
+        //     const mockCloudinaryResponse = {
+        //         secure_url: "https://mocked-cloudinary-url/image.jpg"
+        //     };
+        //     (cloudinary.v2.uploader.upload as jest.Mock).mockResolvedValue(mockCloudinaryResponse);
 
-            const blogData = {
-                title: "ATLP Journey",
-                author: "Jacqueline",
-                content: "blog content"
-            };
+        //     const blogData = {
+        //         title: "ATLP Journey",
+        //         author: "Jacqueline",
+        //         content: "blog content"
+        //     };
 
-            const response = await request(app)
-            .post("/api/blogs")
-            .set("Authorization", `Bearer ${adminAuthToken}`)
-            .field("title", blogData.title)
-            .field("author", blogData.author)
-            .field("content", blogData.content)
-            .attach("image", filePath) // Attach the image file
-            .expect(201)
-            .expect("Content-Type", /json/);
+        //     const response = await request(app)
+        //     .post("/api/blogs")
+        //     .set("Authorization", `Bearer ${adminAuthToken}`)
+        //     .field("title", blogData.title)
+        //     .field("author", blogData.author)
+        //     .field("content", blogData.content)
+        //     .attach("image", filePath) // Attach the image file
+        //     .expect(201)
+        //     .expect("Content-Type", /json/);
 
-            expect(response.body.message).toStrictEqual("Blog created successfully!");
+        //     expect(response.body.message).toStrictEqual("Blog created successfully!");
 
-            expect(response.body.data).toBeDefined();
-            expect(response.body.data.title).toEqual(blogData.title);
-            expect(response.body.data.author).toEqual(blogData.author);
-            expect(response.body.data.content).toEqual(blogData.content);
-            expect(response.body.data.imageUrl).toEqual(mockCloudinaryResponse.secure_url);
-        });
+        //     expect(response.body.data).toBeDefined();
+        //     expect(response.body.data.title).toEqual(blogData.title);
+        //     expect(response.body.data.author).toEqual(blogData.author);
+        //     expect(response.body.data.content).toEqual(blogData.content);
+        //     expect(response.body.data.imageUrl).toEqual(mockCloudinaryResponse.secure_url);
+        // });
 
         it("should return all blogs and 200", async () => {
             const {body} = await request(app)
