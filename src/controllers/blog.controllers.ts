@@ -1,9 +1,16 @@
 import { Request, Response } from "express";
 import Blog, { IBlog } from "../models/blog";
 import User from "../models/user";
-import cloudinary from "cloudinary";
+import {v2 as cloudinary} from "cloudinary";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
+
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 
 interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
     user?: any;
@@ -11,23 +18,34 @@ interface AuthenticatedRequest<T = Record<string, any>> extends Request<T> {
 
 
 // create blog
-const httpCreateBlog = async (req: Request, res: Response): Promise<void> => {
-    const { title, author, content } = req.body;
+const httpCreateBlog = async (req: Request, res: Response): Promise<any> => {
+    // const { title, author, content } = req.body;
 
-    const imageUrl = req.file ? req.file.path : null;
 
-    if (!title || !author || !content) {
-        res.status(400).json({ error: "Missing required fields" });
-        return;
-    }
+
+    let imageUrl;
+    // = req.file ? req.file.path : (
+    //     res.status(400).json({ error: "Missing image file" })
+        
+    // );
+    if(req.file){
+        imageUrl = req.file.path
+    }else{
+        return res.status(400).json({ error: "Missing image file" })
+    };
+
+    // if (!title || !author || !content) {
+    //     res.status(400).json({ error: "Missing required fields" });
+    //     return;
+    // }
 
     try {
         if (imageUrl){
-            const cloudinaryResponse = await cloudinary.v2.uploader.upload(imageUrl);
-            const blog: IBlog = new Blog({
-                title,
-                author,
-                content,
+            const cloudinaryResponse = await cloudinary.uploader.upload(imageUrl);
+            const blog= new Blog({
+                title: req.body.title,
+                author: req.body.author,
+                content: req.body.content,
                 imageUrl: cloudinaryResponse.secure_url
             });
             await blog.save();

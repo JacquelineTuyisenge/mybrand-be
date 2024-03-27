@@ -36,12 +36,12 @@ const upload = multer({
 blogRouter.get("/allblogs", httpBlog.httpGetBlog);
 
  // create blog, also here we used isValid
-blogRouter.post("/", upload.single("image"), isValid, authCheck.isAdmin, httpBlog.httpCreateBlog);
+blogRouter.post("/", upload.single("imageUrl"), isValid, authCheck.isAdmin, httpBlog.httpCreateBlog);
 // get individual blog post
 blogRouter.get("/:id", httpBlog.httpGetSingleBlog);
 
 // Update the blog , single blog
-blogRouter.patch("/:id",authCheck.isAdmin, upload.single("image"), isValid,  httpBlog.httpUpdateSingleBlog);
+blogRouter.patch("/:id",authCheck.isAdmin, upload.single("imageUrl"), isValid,  httpBlog.httpUpdateSingleBlog);
 
 // delete blog post
 blogRouter.delete("/:id",authCheck.isAdmin ,httpBlog.httpDeleteSingleBlog);
