@@ -392,10 +392,7 @@
               "$ref": "#/components/responses/UnauthorizedError"
             }
           }
-        }
-      },
-  
-      "/blogs/allblogs/": {
+        },
         "get": {
           "tags": ["Blogs"],
           "summary": "Get all blogs",
@@ -436,9 +433,7 @@
               "$ref": "#/components/responses/NotFound"
             }
           }
-        }
-      },
-      "/blogs/{Id}": {
+        },
         "patch": {
           "tags": ["Blogs"],
           "summary": "Update blog.",
@@ -473,9 +468,7 @@
               "$ref": "#/components/responses/ServerError"
             }
           }
-        }
-      },
-      "/blogs/{ID}": {
+        },
         "delete": {
           "tags": ["Blogs"],
           "summary": "Delete delete.",
@@ -504,7 +497,7 @@
           }
         }
       },
-      "/blogs/{ID}/comments/allcomments": {
+      "/blogs/{ID}/comments": {
         "get": {
           "tags": ["Comments"],
           "summary": "Blog comments",
@@ -529,9 +522,7 @@
               "$ref": "#/components/responses/NotFound"
             }
           }
-        }
-      },
-      "/blogs/{ID}/comments/addcomment": {
+        },
         "post": {
           "tags": ["Comments"],
           "summary": "Create comment",
@@ -564,9 +555,6 @@
             },
             "400": {
               "$ref": "#/components/responses/BadRequest"
-            },
-            "401": {
-              "$ref": "#/components/responses/Unauthorized"
             }
           }
         }
@@ -606,6 +594,41 @@
               "$ref": "#/components/responses/ServerError"
             }
           }
+        },
+        "get": {
+          "tags": ["Likes"],
+          "summary": "Get blog likes",
+          "description": "Get number of blog likes",
+          "parameters": [
+            {
+              "name": "ID",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "description": "Blog id",
+                "example": "1"
+              },
+              "description": "Blog id"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Likes retrieved successfully.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "total likes": {
+                        "type": "number",
+                        "description": "Number of likes for the blog"
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       },
       "/querries/": {
@@ -634,9 +657,7 @@
               "$ref": "#/components/responses/ServerError"
             }
           }
-        }
-      },
-      "/querries/allquerries/": {
+        },
         "get": {
           "tags": ["Queries"],
           "summary": "Get all queries",
@@ -656,3 +677,4 @@
       }
     }
   }
+}
