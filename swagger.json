@@ -623,12 +623,13 @@
                       "total likes": {
                         "type": "number",
                         "description": "Number of likes for the blog"
-                    }
-                  }
-                }
-              }
-            }
-          }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
         }
       },
       "/querries/": {
@@ -677,4 +678,3 @@
       }
     }
   }
-}
