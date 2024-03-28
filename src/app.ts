@@ -8,6 +8,8 @@ import express from "express"; // creating a server
 
 import apiRouter from './routes/allRoutes';
 
+import cors from "cors";
+
 import swaggerUi from 'swagger-ui-express';
 import fs from "fs";
 const jsonData = JSON.parse(fs.readFileSync("./swagger.json", "utf-8"));
@@ -15,6 +17,19 @@ const jsonData = JSON.parse(fs.readFileSync("./swagger.json", "utf-8"));
 
 
 const app = express(); // app variable to configure our server 
+
+const corsOpts = {
+    origin: '*', // popular origin
+    
+    methods: [
+    'GET',
+    'POST',
+    'DELETE',
+    'PATCH',
+    'PUT'
+    ]
+    };
+app.use(cors(corsOpts));
 
 
 app.use(express.json()); // middleware
