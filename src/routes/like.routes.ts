@@ -5,5 +5,6 @@ import authcheck from "../middlewares/authentication";
 const likeRouter = express.Router();
 
 likeRouter.post("/:id/likes", authcheck.authLogin, httpLike.like);
+likeRouter.get("/:id/likes", httpLike.likesNumber);
 
 export default likeRouter;

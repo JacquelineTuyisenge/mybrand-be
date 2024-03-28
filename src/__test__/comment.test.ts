@@ -16,9 +16,8 @@ jest.setTimeout(20000);
 let token: string;
 let decoded: JwtPayload;
 
-const adminAuthToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDMzMTJmNDIxZDY4MmU5NWZhNTZmYyIsImZ1bGxOYW1lIjoiamFja3kgZWx5bmVlIiwicm9sZSI6IkFkbWluIiwiaWF0IjoxNzExNDg1MjgxLCJleHAiOjE3MTE1NzE2ODF9.gLbOQWFgHZ4U9eT9V60zJrmpbrzZWzBva5EMeqTInqo";
-
+const adminAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDU0MGUxZThjZDA1OWU2YWRiNGEyMSIsImZ1bGxOYW1lIjoiS3V6d2EgUGFjY3kiLCJyb2xlIjoiQWRtaW4iLCJpYXQiOjE3MTE2MjAzNTN9.gWTnJVlIX0Pnp36yinZy84uGON9oP-wOuXsdrvfygyM";
+  
 jest.mock("cloudinary");
 const filePath =
   "C:/Users/Nexus Tel 0785512718/OneDrive/Desktop/Jacky/jacky.jpg";

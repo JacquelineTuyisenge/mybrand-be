@@ -63,7 +63,7 @@
 
       
 
-        it("should return 400 if user already exists", async () => {
+        it("should return 409 if user already exists", async () => {
             // Create a user in the database with the same email as the one in the request body
             await User.create({ 
                 fullName: "Test User", 
@@ -81,12 +81,12 @@
                     password: "Pass456",
                     confirmPassword: "Pass456",
                     role: "User"})
-                .expect(400)
+                .expect(409)
                 .expect("Content-Type", /json/);
     
             // Assert that the response contains the expected error message
             expect(response.body).toStrictEqual({
-                status: 400,
+                status: 409,
                 message: "Email test@example.com already exists!"
             });
         });

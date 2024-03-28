@@ -20,8 +20,8 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
         const userExists = await User.findOne({ email: req.body.email });
 
         if (userExists) {
-            res.status(400).json({
-                status: 400,
+            res.status(409).json({
+                status: 409,
                 message: `Email ${req.body.email} already exists!`
             });
             return;
@@ -97,8 +97,7 @@ const logIn = async (req: Request, res: Response) => {
                 fullName: userAvailable.fullName,
                 role: userAvailable.role
             },
-            secretKey as string,
-            { expiresIn: '1y' }
+            secretKey as string
         );
 
         res.status(200).json({

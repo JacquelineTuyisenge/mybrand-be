@@ -223,6 +223,11 @@
               "description": " blog title",
               "example": "cyberTrack"
             },
+            "author": {
+              "type": "string",
+              "description": "blog author",
+              "example": "Shallon"
+            },
             "content": {
               "type": "string",
               "description": "blog content",
@@ -318,6 +323,9 @@
             "201": {
               "description": "User created successfully!"
             },
+            "409": {
+              "$ref": "#/components/responses/ConflictError"
+            },
             "400": {
               "$ref": "#/components/responses/BadRequest"
             }
@@ -366,9 +374,9 @@
                     "title": { "type": "string" },
                     "author": { "type": "string" },
                     "content": { "type": "string" },
-                    "image": { "type": "string", "format": "binary" }
+                    "imageUrl": { "type": "string", "format": "binary" }
                   },
-                  "required": ["title", "author", "content", "image"]
+                  "required": ["title", "author", "content", "imageUrl"]
                 }
               }
             }
@@ -628,21 +636,21 @@
           }
         }
       },
-      "/queries/allqueries": {
+      "/querries/allquerries/": {
         "get": {
           "tags": ["Queries"],
           "summary": "Get all queries",
-          "description": "Get all queries"
-        },
-        "responses": {
-          "200": {
-            "description": "Queries retrieved successfully."
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          },
-          "500": {
-            "$ref": "#/components/responses/ServerError"
+          "description": "Get all queries",
+          "responses": {
+            "200": {
+              "description": "Queries retrieved successfully."
+            },
+            "404": {
+              "$ref": "#/components/responses/NotFound"
+            },
+            "500": {
+              "$ref": "#/components/responses/ServerError"
+            }
           }
         }
       }
