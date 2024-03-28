@@ -76,7 +76,7 @@ describe("Blog API", () => {
 
     it("should return all blogs and 200", async () => {
       const { body } = await request(app)
-        .get("/api/blogs/allblogs")
+        .get("/api/blogs")
         .expect(200)
         .expect("Content-Type", /json/);
 
